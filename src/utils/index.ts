@@ -1,5 +1,9 @@
 import {Dimensions} from 'react-native';
-import {NavigationState} from '@react-navigation/native';
+import {
+  NavigationState,
+  NavigationContainerRef,
+} from '@react-navigation/native';
+import React from 'react';
 
 const {width: viewportWidth, height: viewportHeight} = Dimensions.get('window');
 // 根据百分比获取参数
@@ -21,4 +25,30 @@ function getActiveRouteName(state: NavigationState) {
   return route.name;
 }
 
-export {viewportWidth, viewportHeight, wp, hp, getActiveRouteName};
+function formatTime(seconds: number) {
+  const m = parseInt((seconds % (60 * 60)) / 60 + '', 10);
+  const s = parseInt((seconds % 60) + '', 10);
+  return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+}
+
+const navigationRef = React.createRef<NavigationContainerRef>();
+
+function navigate(name: string, params?: any) {
+  navigationRef.current?.navigate(name, params);
+}
+
+function goBack() {
+  navigationRef.current?.goBack();
+}
+
+export {
+  viewportWidth,
+  viewportHeight,
+  wp,
+  hp,
+  getActiveRouteName,
+  formatTime,
+  navigationRef,
+  navigate,
+  goBack,
+};

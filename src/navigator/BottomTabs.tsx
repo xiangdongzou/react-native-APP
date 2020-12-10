@@ -7,10 +7,12 @@ import Account from '@/pages/Account';
 import {RootStackNavigation, RootStackParamList} from '.';
 import IconFont from '@/assets/iconfont';
 import HomeTabs from './HomeTabs';
+import Play from '@/pages/views/Play';
 
 export type BottomTabParamList = {
   HomeTabs: undefined;
   Listen: undefined;
+  Play: undefined;
   Found: undefined;
   Account: undefined;
 };
@@ -88,6 +90,15 @@ class BottomTabs extends Component<IProps> {
           }}
           name="Listen"
           component={Listen}
+        />
+        <Tab.Screen
+          name="Play"
+          component={Play}
+          options={({navigation}) => ({
+            tabBarButton: () => {
+              return <Play onPress={() => navigation.navigate('Detail')} />;
+            },
+          })}
         />
         <Tab.Screen
           options={{

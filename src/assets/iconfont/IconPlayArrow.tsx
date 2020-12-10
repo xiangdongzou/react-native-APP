@@ -11,7 +11,7 @@ interface Props extends GProps, ViewProps {
   color?: string | string[];
 }
 
-let IconPlayArrow: FunctionComponent<Props> = ({ size, color, ...rest }) => {
+export const IconPlayArrow: FunctionComponent<Props> = ({ size, color, ...rest }) => {
   return (
     <Svg viewBox="0 0 1024 1024" width={size} height={size} {...rest}>
       <Path
@@ -25,7 +25,5 @@ let IconPlayArrow: FunctionComponent<Props> = ({ size, color, ...rest }) => {
 IconPlayArrow.defaultProps = {
   size: 18,
 };
-
-IconPlayArrow = React.memo ? React.memo(IconPlayArrow) : IconPlayArrow;
 
 export default IconPlayArrow;

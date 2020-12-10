@@ -11,7 +11,7 @@ interface Props extends GProps, ViewProps {
   color?: string | string[];
 }
 
-let IconFavoritesFill: FunctionComponent<Props> = ({ size, color, ...rest }) => {
+export const IconFavoritesFill: FunctionComponent<Props> = ({ size, color, ...rest }) => {
   return (
     <Svg viewBox="0 0 1024 1024" width={size} height={size} {...rest}>
       <Path
@@ -25,7 +25,5 @@ let IconFavoritesFill: FunctionComponent<Props> = ({ size, color, ...rest }) => 
 IconFavoritesFill.defaultProps = {
   size: 18,
 };
-
-IconFavoritesFill = React.memo ? React.memo(IconFavoritesFill) : IconFavoritesFill;
 
 export default IconFavoritesFill;

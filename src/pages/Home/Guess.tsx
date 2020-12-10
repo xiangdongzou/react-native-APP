@@ -42,7 +42,9 @@ class Guess extends Component<IProps> {
           goAlbum(item);
         }}>
         <Image source={{uri: item.image}} style={styles.image} />
-        <Text numberOfLines={1}>{item.title}</Text>
+        <Text numberOfLines={1} style={{textAlign: 'center'}}>
+          {item.title}
+        </Text>
       </Touchable>
     );
   };
@@ -53,12 +55,12 @@ class Guess extends Component<IProps> {
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerRight}>
-            <IconFont name="icon-qunfengcainixihuanxian" />
+            <IconFont name="icon-xihuan" />
             <Text style={styles.headerTitle}>猜你喜欢</Text>
           </View>
           <View style={styles.headerLeft}>
             <Text style={styles.moreText}>更多</Text>
-            <IconFont name="icon-tubiao-" />
+            <IconFont name="icon-more" />
           </View>
         </View>
         <FlatList

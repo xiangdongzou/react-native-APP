@@ -1,16 +1,26 @@
-import React, {Component} from 'react';
-import {NavigationContainer, RouteProp} from '@react-navigation/native';
+import React from 'react';
 import {
-  CardStyleInterpolators,
+  NavigationContainer,
+  RouteProp,
+  NavigationState,
+} from '@react-navigation/native';
+import {
   createStackNavigator,
-  HeaderStyleInterpolators,
   StackNavigationProp,
+  HeaderStyleInterpolators,
+  CardStyleInterpolators,
+  TransitionPresets,
 } from '@react-navigation/stack';
 import BottomTabs from './BottomTabs';
-import Album from '@/pages/Album';
 import Category from '@/pages/Category';
-import {Platform, StatusBar, StyleSheet} from 'react-native';
-import Animated from 'react-native';
+import Album from '@/pages/Album';
+import Detail from '@/pages/Detail';
+import {Platform, StyleSheet, StatusBar, Animated} from 'react-native';
+import {getActiveRouteName, navigationRef} from '../utils';
+import SplashScreen from 'react-native-splash-screen';
+import IconFont from '@/assets/iconfont';
+import PlayView from '@/pages/views/PlayView';
+import Login from '@/pages/Login';
 
 export type RootStackParamList = {
   BottomTabs: {
@@ -23,8 +33,10 @@ export type RootStackParamList = {
       title: string;
       image: string;
     };
+    opacity?: Animated.Value;
   };
 };
+
 export type RootStackNavigation = StackNavigationProp<RootStackParamList>;
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -38,13 +50,18 @@ function getAlbumOptions({
     headerTitle: route.params.item.title,
     headerTransparent: true,
     headerTitleStyle: {
-      opacity: 0,
+      opacity: route.params.opacity,
     },
     headerBackground: () => {
-      return <Animated.View style={styles.headerBackground} />;
+      return (
+        <Animated.View
+          style={[styles.headerBackground, {opacity: route.params.opacity}]}
+        />
+      );
     },
   };
 }
+
 const styles = StyleSheet.create({
   headerBackground: {
     flex: 1,
@@ -56,45 +73,135 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class Navigator extends Component {
-  render() {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerTitleAlign: 'center',
-            headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
-            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-            gestureEnabled: true,
-            gestureDirection: 'horizontal',
+function RootStackScreen() {
+  return (
+    <Stack.Navigator
+      headerMode="float"
+      screenOptions={{
+        headerTitleAlign: 'center',
+        headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        ...Platform.select({
+          android: {
             headerStatusBarHeight: StatusBar.currentHeight,
-            headerStyle: {
-              ...Platform.select({
-                android: {
-                  elevation: 0,
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                },
-              }),
+          },
+        }),
+        headerBackTitleVisible: false,
+        headerTintColor: '#333',
+        headerStyle: {
+          ...Platform.select({
+            android: {
+              elevation: 0,
+              borderBottomWidth: StyleSheet.hairlineWidth,
             },
-          }}
-          headerMode="float">
-          <Stack.Screen
-            name="BottomTabs"
-            component={BottomTabs}
-            options={{headerTitle: '首页'}}
-          />
-          <Stack.Screen
-            name="Category"
-            component={Category}
-            options={{headerTitle: '分类'}}
-          />
-          <Stack.Screen
-            name="Album"
-            component={Album}
-            options={getAlbumOptions}
-          />
-        </Stack.Navigator>
+          }),
+        },
+      }}>
+      <Stack.Screen
+        name="BottomTabs"
+        component={BottomTabs}
+        options={{
+          headerTitle: '首页',
+        }}
+      />
+      <Stack.Screen
+        name="Category"
+        component={Category}
+        options={{
+          headerTitle: '分类',
+        }}
+      />
+      <Stack.Screen name="Album" component={Album} options={getAlbumOptions} />
+    </Stack.Navigator>
+  );
+}
+
+export type ModalStackParamList = {
+  Root: undefined;
+  Detail: {
+    id: string;
+  };
+  Login: undefined;
+};
+
+const ModalStack = createStackNavigator<ModalStackParamList>();
+
+export type ModalStackNavigation = StackNavigationProp<ModalStackParamList>;
+
+function ModalStackScreen() {
+  return (
+    <ModalStack.Navigator
+      mode="modal"
+      headerMode="screen"
+      screenOptions={{
+        headerTitleAlign: 'center',
+        gestureEnabled: true,
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+        headerBackTitleVisible: false,
+        headerTintColor: '#333',
+      }}>
+      <ModalStack.Screen
+        name="Root"
+        component={RootStackScreen}
+        options={{headerShown: false}}
+      />
+      <ModalStack.Screen
+        name="Detail"
+        component={Detail}
+        options={{
+          headerTintColor: '#fff',
+          headerTitle: '',
+          headerTransparent: true,
+          cardStyle: {backgroundColor: '#807c66'},
+          headerBackImage: ({tintColor}) => (
+            <IconFont
+              name="icon-down"
+              size={30}
+              color={tintColor}
+              style={styles.headerBackImage}
+            />
+          ),
+        }}
+      />
+      <ModalStack.Screen
+        name="Login"
+        component={Login}
+        options={{
+          headerTitle: '登录',
+        }}
+      />
+    </ModalStack.Navigator>
+  );
+}
+
+class Navigator extends React.Component {
+  state = {
+    routeName: 'Root',
+  };
+  componentDidMount() {
+    SplashScreen.hide();
+  }
+  onStateChange = (state: NavigationState | undefined) => {
+    if (typeof state !== 'undefined') {
+      const routeName = getActiveRouteName(state);
+      this.setState({
+        routeName,
+      });
+    }
+  };
+  render() {
+    const {routeName} = this.state;
+    return (
+      <NavigationContainer
+        ref={navigationRef}
+        onStateChange={this.onStateChange}>
+        <ModalStackScreen />
+        <PlayView routeName={routeName} />
       </NavigationContainer>
     );
   }
 }
+
+export default Navigator;

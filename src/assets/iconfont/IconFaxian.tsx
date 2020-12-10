@@ -11,7 +11,7 @@ interface Props extends GProps, ViewProps {
   color?: string | string[];
 }
 
-let IconFaxian: FunctionComponent<Props> = ({ size, color, ...rest }) => {
+export const IconFaxian: FunctionComponent<Props> = ({ size, color, ...rest }) => {
   return (
     <Svg viewBox="0 0 1024 1024" width={size} height={size} {...rest}>
       <Path
@@ -25,7 +25,5 @@ let IconFaxian: FunctionComponent<Props> = ({ size, color, ...rest }) => {
 IconFaxian.defaultProps = {
   size: 18,
 };
-
-IconFaxian = React.memo ? React.memo(IconFaxian) : IconFaxian;
 
 export default IconFaxian;
